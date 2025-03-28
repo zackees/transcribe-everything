@@ -7,17 +7,20 @@ name = "transcribe_everything"
 readme = "README.md"
 description = "transcribe transcriptions ai whisper"
 requires-python = ">=3.10"
-keywords = ["template-python-cmd"]
+keywords = ["ai", "transcribe", "anything", "everything", "s3", "remote", "big", "data"]
 license = { text = "BSD 3-Clause License" }
 classifiers = ["Programming Language :: Python :: 3"]
+dynamic = ["version"]
+
 dependencies = [
 
 ]
-# Change this with the version number bump.
-version = "0.0.1"
-
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+version = { attr = "transcribe_everything.__version__" }
 
 [tool.ruff]
 line-length = 200
@@ -39,9 +42,6 @@ disable = [
 [tool.isort]
 profile = "black"
 
-[tool.mypy]
-ignore_missing_imports = true
-disable_error_code = ["import-untyped"]
 
 [project.scripts]
 transcribe_everything = "transcribe_everything.cli:main"
