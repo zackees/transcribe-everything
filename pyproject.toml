@@ -13,7 +13,8 @@ classifiers = ["Programming Language :: Python :: 3"]
 dynamic = ["version"]
 
 dependencies = [
-
+    "transcribe-anything>=3.0.4",
+    "virtual-fs>=1.0.14",
 ]
 [tool.setuptools]
 package-dir = {"" = "src"}
