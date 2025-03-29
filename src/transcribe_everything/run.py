@@ -81,8 +81,9 @@ def find_batches(args: Args) -> list[Batch]:
 
 
 def _run_witch_callback(
-    args: Args, callback: Callable[[FSPath, FSPath], None]
+    args: Args, callback: Callable[[FSPath, FSPath], Exception | None]
 ) -> Exception | None:
+    exceptions: list[Exception] = []
     try:
         batch_size = args.batch_size
         batches = find_batches(args)
@@ -91,9 +92,13 @@ def _run_witch_callback(
             unprocessed = batch.unprocessed()[:batch_size]
             for file in unprocessed:
                 dst_file = file.with_suffix(".txt")
-                callback(file, dst_file)
+                err = callback(file, dst_file)
+                if err:
+                    exceptions.append(err)
     except Exception as e:
-        return e
+        exceptions.append(e)
+    if exceptions:
+        return Exception(f"Multiple exceptions: {exceptions}", exceptions)
     return None
 
 
