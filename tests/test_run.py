@@ -40,27 +40,3 @@ class MainTester(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-"""
-
-
-import sys
-
-from transcribe_everything.args import Args
-from transcribe_everything.run import run
-
-
-def main() -> int:
-    args = Args.parse_args()
-    return run(args)
-
-
-if __name__ == "__main__":
-    src = "dst:TorrentBooks/podcast"
-    dst = "dst:TorrentBooks/podcast"
-    sys.argv.append(src)
-    sys.argv.append(dst)
-    sys.exit(main())
-
-"""
