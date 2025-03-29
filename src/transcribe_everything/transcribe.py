@@ -2,22 +2,25 @@
 Main entry point.
 """
 
+import os
 import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
 from logging import getLogger
 from pathlib import Path
 
-from langdetect import detect
 from transcribe_anything import transcribe_anything
 from virtual_fs import FSPath
 
-from transcribe_everything.util import is_media_file
+from transcribe_everything.util import get_language, is_media_file
 
 logger = getLogger(__name__)
+
+_PROCESS_ID = os.getpid()
 
 _MODEL = "large-v3"
 _DEVICE = "insane"
 _TEMP_DIR = Path(".tmp")
+_THIS_TEMP_DIR = _TEMP_DIR / f"{_PROCESS_ID}"
 
 
 _OTHER_ARGS = [
@@ -44,27 +47,9 @@ def _random_str(n: int = 10) -> str:
     return "".join(random.choices(string.ascii_lowercase, k=n))
 
 
-def _name_without_suffix(name: str) -> str:
-    return Path(name).stem
-
-
-def _is_english(text: str) -> bool | Exception:
-    try:
-        lang = _get_language(text)
-        return lang == "en"
-    except Exception:
-        return False
-
-
-def _get_language(text: str) -> str:
-    text = _name_without_suffix(text)
-    text = text.replace("_", " ")
-    return detect(text)
-
-
 class _TempDir:
     def __init__(self):
-        self._tmpdir_path = _TEMP_DIR / _random_str()
+        self._tmpdir_path = _THIS_TEMP_DIR / _random_str()
         self._tmpdir = str(self._tmpdir_path)
         self._tmpdir_path.mkdir(exist_ok=True, parents=True)
 
@@ -79,7 +64,7 @@ class _TempDir:
 def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
     # print(f"Transcribing {src} to {dst}")
 
-    lang = _get_language(src.name)
+    lang = get_language(src.name)
     if lang != "en":
         logger.info(
             f"Skipping {src} because the file title appears not to be in English, was instead {lang}"
@@ -88,18 +73,16 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
     try:
         assert is_media_file(src.suffix), f"Expected .mp3, got {src.suffix}"
         assert dst.suffix == ".txt", f"Expected .txt, got {dst.suffix}"
-        # move file to temp location
-        tmpobj = _TempDir()
-        tmpdir = tmpobj.__enter__()
-        # logger.info(f"Using temp dir {tmpdir}")
+        # Prepare data context for the pipeline.
+        tmpobj = (
+            _TempDir()
+        )  # This will be opened and finally exited during the lifespan of the active job.
+        tmpdir = tmpobj._tmpdir_path
         filename = Path(src.path).name
         tmp = Path(tmpdir)
         dst_tmp = tmp / filename
         dst_txt = dst.with_suffix(".txt")
-
-        # find the transcribed file called out.txt
         out_txt = tmp / "out.txt"
-        # logger.info(f"out_txt: {out_txt}")
 
         def task_download(src=src, dst_tmp=dst_tmp) -> Exception | None:
             try:
@@ -146,23 +129,27 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
             task_download=task_download,
             task_transcribe=task_transcribe,
             task_upload=task_upload,
-        ):
+        ) -> Exception | None:
             logger.info(f"START TOP level transcritpion pipeline of {src} to {dst}")
-            try:
-                err = _THREAD_POOL_DOWNLOAD.submit(task_download).result()
-                if err:
-                    return err
-                err = _THREAD_POOL_TRANSCRIBE.submit(task_transcribe).result()
-                if err:
-                    return err
-                err = _THREAD_POOL_UPLOAD.submit(task_upload).result()
-                if err:
-                    return err
-                logger.info(
-                    f"FINISHED TOP level transcription pipeline of {src} to {dst}"
-                )
-            finally:
-                tmpobj.__exit__(None, None, None)
+            with tmpobj:
+                try:
+                    err = _THREAD_POOL_DOWNLOAD.submit(task_download).result()
+                    if err:
+                        return err
+                    err = _THREAD_POOL_TRANSCRIBE.submit(task_transcribe).result()
+                    if err:
+                        return err
+                    err = _THREAD_POOL_UPLOAD.submit(task_upload).result()
+                    if err:
+                        return err
+                    logger.info(
+                        f"FINISHED TOP level transcription pipeline of {src} to {dst}"
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"ERROR TOP level transcription pipeline of {src} to {dst}"
+                    )
+                    return e
             return None
 
         return _THREAD_POOL_TOP_LEVEL.submit(wait_task)
