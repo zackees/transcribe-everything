@@ -22,4 +22,8 @@ def main() -> int:
 if __name__ == "__main__":
     src = "dst:TorrentBooks/podcast"
     sys.argv.append(src)
+    sys.argv.append("--max-batches")
+    sys.argv.append("1")
+    sys.argv.append("--batch-size")
+    sys.argv.append("1")
     sys.exit(main())
