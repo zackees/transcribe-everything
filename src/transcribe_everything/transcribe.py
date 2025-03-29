@@ -4,12 +4,15 @@ Main entry point.
 
 import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
+from logging import getLogger
 from pathlib import Path
 
 from transcribe_anything import transcribe_anything
 from virtual_fs import FSPath
 
 from transcribe_everything.util import is_media_file
+
+logger = getLogger(__name__)
 
 _MODEL = "large"
 _DEVICE = "insane"
@@ -83,6 +86,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
         assert dst.suffix == ".txt", f"Expected .txt, got {dst.suffix}"
         # move file to temp location
         with _TempDir() as tmpdir:
+            logger.info(f"Using temp dir {tmpdir}")
             filename = Path(src.path).name
             tmp = Path(tmpdir)
             dst_tmp = tmp / filename
@@ -90,11 +94,15 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
             src_bytes = src.read_bytes()
             # find the transcribed file called out.txt
             out_txt = tmp / "out.txt"
+            logger.info(f"out_txt: {out_txt}")
 
             def task_download(src_bytes=src_bytes, dst_tmp=dst_tmp) -> Exception | None:
                 try:
+                    logger.info(f"BEGIN downloading {src} to {dst_tmp}")
                     dst_tmp.write_bytes(src_bytes)
+                    logger.info(f"FINISHED downloading {src} to {dst_tmp}")
                 except Exception as e:
+                    logger.error(f"ERROR downloading {src} to {dst_tmp}")
                     return e
 
             def task_transcribe(
@@ -104,21 +112,27 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                 device=_DEVICE,
             ) -> Exception | None:
                 try:
+                    logger.info(f"BEGIN transcribing {url_or_file}")
                     transcribe_anything(
                         url_or_file=url_or_file,
                         output_dir=output_dir,
                         model=model,
                         device=device,
                     )
+                    logger.info(f"FINISHED transcribing {url_or_file}")
                 except Exception as e:
+                    logger.error(f"ERROR transcribing {url_or_file}")
                     return e
 
             def task_upload(out_txt=out_txt, dst_txt=dst_txt) -> Exception | None:
                 try:
+                    logger.info(f"BEGIN uploading {out_txt} to {dst_txt}")
                     assert out_txt.exists(), f"Expected {out_txt} to exist"
                     bytes = out_txt.read_bytes()
                     dst_txt.write_bytes(bytes)
+                    logger.info(f"FINISHED uploading {out_txt} to {dst_txt}")
                 except Exception as e:
+                    logger.error(f"ERROR uploading {out_txt} to {dst_txt}")
                     return e
 
             def wait_task(
@@ -126,6 +140,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                 task_transcribe=task_transcribe,
                 task_upload=task_upload,
             ):
+                logger.info(f"START transcribing {src} to {dst}")
                 err = _THREAD_POOL_DOWNLOAD.submit(task_download).result()
                 if err:
                     return err
@@ -135,6 +150,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                 err = _THREAD_POOL_UPLOAD.submit(task_upload).result()
                 if err:
                     return err
+                logger.info(f"FINISHED transcribing {src} to {dst}")
                 return None
 
             return _THREAD_POOL_TOP_LEVEL.submit(wait_task)

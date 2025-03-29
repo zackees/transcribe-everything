@@ -2,11 +2,17 @@
 Main entry point.
 """
 
+import logging
 import sys
 import warnings
 
 from transcribe_everything.args import Args
 from transcribe_everything.run import run
+
+# Initialize logging for info on this package
+
+logger = logging.getLogger("transcribe_everything")
+logger.setLevel(logging.INFO)
 
 
 def main() -> int:
