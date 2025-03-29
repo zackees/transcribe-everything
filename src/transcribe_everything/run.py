@@ -3,11 +3,12 @@ Main entry point.
 """
 
 from dataclasses import dataclass
-from typing import Iterator
+from typing import Callable, Iterator
 
 from virtual_fs import FSPath, Vfs
 
 from transcribe_everything.args import Args
+from transcribe_everything.transcribe import transcribe
 from transcribe_everything.util import is_media_file
 
 
@@ -75,11 +76,28 @@ def find_files(args: Args) -> list[Batch]:
     return batches
 
 
-def run(args: Args) -> int:
-    batches = find_files(args)
-    print(f"Found {len(batches)} batches.")
+def _run_witch_callback(
+    args: Args, callback: Callable[[FSPath, FSPath], None]
+) -> Exception | None:
+    try:
+        batch_size = args.batch_size
+        batches = find_files(args)
 
-    for batch in batches:
-        for file in batch:
-            print(f"Found unprocessed file: {file}")
+        for batch in batches:
+            unprocessed = batch.unprocessed()[:batch_size]
+            for file in unprocessed:
+                dst_file = file.with_suffix(".txt")
+                callback(file, dst_file)
+    except Exception as e:
+        return e
+    return None
+
+
+def run(args: Args) -> int:
+    err = _run_witch_callback(args, transcribe)
+    if err:
+        import warnings
+
+        warnings.warn(f"Error: {err}")
+        return 1
     return 0
