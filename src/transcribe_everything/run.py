@@ -3,6 +3,7 @@ Main entry point.
 """
 
 from dataclasses import dataclass
+from typing import Iterator
 
 from virtual_fs import FSPath, Vfs
 
@@ -37,6 +38,24 @@ class Batch:
     def __repr__(self) -> str:
         return str(self)
 
+    def unprocessed(self, max_size: int | None = None) -> list[FSPath]:
+        out = _reduce(self.files)
+        if max_size is not None:
+            out = out[:max_size]
+        return out
+
+    def processed(self) -> list[FSPath]:
+        return [file.with_suffix(".txt") for file in self.files]
+
+    def __bool__(self) -> bool:
+        return bool(self.unprocessed())
+
+    def __len__(self) -> int:
+        return len(self.unprocessed())
+
+    def __iter__(self) -> Iterator[FSPath]:
+        return iter(self.unprocessed())
+
 
 def find_files(args: Args) -> list[Batch]:
     vfs_src = Vfs.begin(src=args.src)
@@ -58,5 +77,9 @@ def find_files(args: Args) -> list[Batch]:
 
 def run(args: Args) -> int:
     batches = find_files(args)
-    print(batches)
+    print(f"Found {len(batches)} batches.")
+
+    for batch in batches:
+        for file in batch:
+            print(f"Found unprocessed file: {file}")
     return 0
