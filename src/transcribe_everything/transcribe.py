@@ -2,7 +2,6 @@
 Main entry point.
 """
 
-import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -37,7 +36,8 @@ def transcribe(src: FSPath, dst: FSPath) -> Exception | None:
             filename = Path(src.path).name
             dst_tmp = Path(tmpdir) / filename
             dst_txt = dst_tmp.with_suffix(".txt")
-            shutil.copy(src.path, dst_tmp)
+            src_bytes = src.read_bytes()
+            dst_tmp.write_bytes(src_bytes)
             transcribe_anything(
                 url_or_file=dst_tmp.as_posix(),
                 output_dir=dst.parent.path,
