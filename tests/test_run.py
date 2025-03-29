@@ -15,8 +15,7 @@ COMMAND = "transcribe_everything"
 class MainTester(unittest.TestCase):
     """Main tester class."""
 
-    @classmethod
-    def setUpClass(cls) -> None:
+    def setUp(self):
         """Run before tests."""
         # Monkey patch so that the test doesn't fail with fake files.
         run.transcribe = lambda src, dst: None
