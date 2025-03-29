@@ -101,10 +101,11 @@ def run(args: Args) -> tuple[int, Exception | None]:
 
     count = 0
 
-    def task(file: FSPath, dst: FSPath) -> None:
+    def task(file: FSPath, dst: FSPath) -> Exception | None:
         nonlocal count
-        transcribe(file, dst)
+        err = transcribe(file, dst)
         count += 1
+        return err
 
     err = _run_witch_callback(args, task)
     if err:
