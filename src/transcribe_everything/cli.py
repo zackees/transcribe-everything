@@ -2,43 +2,15 @@
 Main entry point.
 """
 
-import argparse
 import sys
-from dataclasses import dataclass
 
-from virtual_fs import Vfs
+from virtual_fs import FSPath, Vfs
 
-
-@dataclass
-class Args:
-    src: str
-    dst: str
-
-    def __post_init__(self):
-        assert isinstance(self.src, str), f"Expected str, got {type(self.src)}"
-        assert (
-            isinstance(self.dst, str) or self.dst is None
-        ), f"Expected str or None, got {type(self.dst)}"
+from transcribe_everything.cli_args import Args
+from transcribe_everything.util import is_media_file
 
 
-def _parse_args() -> Args:
-    parser = argparse.ArgumentParser(description="Transcribe everything.")
-    parser.add_argument("src", type=str, help="Source path.")
-    parser.add_argument(
-        "dst", type=str, help="Destination path (can be the same as src)"
-    )
-
-    tmp = parser.parse_args()
-    return Args(
-        src=tmp.src,
-        dst=tmp.dst,
-    )
-
-
-def main() -> int:
-    """Main entry point for the template_python_cmd package."""
-    args = _parse_args()
-
+def run(args: Args) -> int:
     vfs_src = Vfs.begin(src=args.src)
     vfs_dst = Vfs.begin(src=args.dst)
 
@@ -47,11 +19,26 @@ def main() -> int:
         print(f"src: {src}")
         print(f"dst: {dst}")
 
-        for root, files, dirs in vfs_src.walk():
-            print(f"root: {root}")
-            print(f"files: {files}")
-            print(f"dirs: {dirs}")
+        media_files: list[FSPath] = []
+
+        with vfs_src.walk_begin() as walker:
+            for root, _, files in walker:
+                for file in files:
+                    if is_media_file(file):
+                        media_files.append(root / file)
+                if len(media_files) > 0:
+                    break
+
+        print(f"found {len(media_files)} media files")
+        for media_file in media_files:
+            print(media_file)
     return 0
+
+
+def main() -> int:
+    """Main entry point for the template_python_cmd package."""
+    args = Args.parse_args()
+    return run(args)
 
 
 if __name__ == "__main__":
