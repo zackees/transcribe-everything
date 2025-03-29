@@ -144,3 +144,4 @@ uv.lock
 
 !.aider.conf.yml
 !.aiderignore
+.tmp
