@@ -23,14 +23,14 @@ class MainTester(unittest.TestCase):
             (cwd / "test.mp4").touch()
             (cwd / "test.txt").touch()
             (cwd / "test.mp3").touch()
-
             args: Args = Args(
                 src=cwd.as_posix(),
                 max_batches=1,
                 batch_size=1,
             )
-            rtn = run(args)
-            self.assertEqual(0, rtn)
+            count, err = run(args)
+            self.assertEqual(1, count)
+            self.assertIsNone(err)
 
 
 if __name__ == "__main__":

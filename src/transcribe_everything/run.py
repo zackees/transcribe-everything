@@ -97,11 +97,18 @@ def _run_witch_callback(
     return None
 
 
-def run(args: Args) -> int:
-    err = _run_witch_callback(args, transcribe)
+def run(args: Args) -> tuple[int, Exception | None]:
+
+    count = 0
+
+    def task(file: FSPath, dst: FSPath) -> None:
+        nonlocal count
+        transcribe(file, dst)
+        count += 1
+
+    err = _run_witch_callback(args, task)
     if err:
         import warnings
 
         warnings.warn(f"Error: {err}")
-        return 1
-    return 0
+    return count, err

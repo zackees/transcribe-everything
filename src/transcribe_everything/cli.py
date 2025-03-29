@@ -3,6 +3,7 @@ Main entry point.
 """
 
 import sys
+import warnings
 
 from transcribe_everything.args import Args
 from transcribe_everything.run import run
@@ -11,7 +12,11 @@ from transcribe_everything.run import run
 def main() -> int:
     """Main entry point for the template_python_cmd package."""
     args = Args.parse_args()
-    return run(args)
+    count, err = run(args)
+    print(f"Processed {count} files.")
+    if err:
+        warnings.warn(str(err))
+    return 0 if not err else 1
 
 
 if __name__ == "__main__":
