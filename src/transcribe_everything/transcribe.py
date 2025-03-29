@@ -36,7 +36,7 @@ def transcribe(src: FSPath, dst: FSPath) -> Exception | None:
             dst_tmp.write_bytes(src_bytes)
             transcribe_anything(
                 url_or_file=dst_tmp.as_posix(),
-                output_dir=tmp,
+                output_dir=tmp.as_posix(),
                 model=_MODEL,
                 device=_DEVICE,
             )
@@ -73,7 +73,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
 
             def task_transcribe(
                 url_or_file=dst_tmp.as_posix(),
-                output_dir=tmp,
+                output_dir=tmp.as_posix(),
                 model=_MODEL,
                 device=_DEVICE,
             ) -> Exception | None:
