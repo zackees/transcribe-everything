@@ -71,7 +71,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
         )
         return _THREAD_POOL_TRANSCRIBE.submit(lambda: None)
     try:
-        assert is_media_file(src.suffix), f"Expected .mp3, got {src.suffix}"
+        assert is_media_file(src.suffix), f"Expected media file got {src.suffix}"
         assert dst.suffix == ".txt", f"Expected .txt, got {dst.suffix}"
         # Prepare data context for the pipeline.
         tmpobj = (
