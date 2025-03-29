@@ -12,11 +12,17 @@ from transcribe_everything.run import run
 def main() -> int:
     """Main entry point for the template_python_cmd package."""
     args = Args.parse_args()
-    count, err = run(args)
-    print(f"Processed {count} files.")
-    if err:
-        warnings.warn(str(err))
-    return 0 if not err else 1
+    err_count = 0
+    while True:
+        count, err = run(args)
+        err_count += 1 if err else 0
+        if err:
+            warnings.warn(str(err))
+            err_count += 1
+        if count == 0:
+            break
+
+    return 0 if not err_count else 1
 
 
 if __name__ == "__main__":
