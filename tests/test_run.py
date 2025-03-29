@@ -15,11 +15,14 @@ COMMAND = "transcribe_everything"
 class MainTester(unittest.TestCase):
     """Main tester class."""
 
-    def test_demo_run_with_real_fs(self) -> None:
-        """Test command line interface (CLI)."""
-
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Run before tests."""
         # Monkey patch so that the test doesn't fail with fake files.
         run.transcribe = lambda src, dst: None
+
+    def test_demo_run_with_real_fs(self) -> None:
+        """Test command line interface (CLI)."""
 
         with TemporaryDirectory() as tmpdir:
             cwd: Path = Path(tmpdir)
