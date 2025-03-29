@@ -2,13 +2,15 @@
 Main entry point.
 """
 
+import warnings
+from concurrent.futures import Future
 from dataclasses import dataclass
 from typing import Callable, Iterator
 
 from virtual_fs import FSPath, Vfs
 
 from transcribe_everything.args import Args
-from transcribe_everything.transcribe import transcribe
+from transcribe_everything.transcribe import transcribe_async
 from transcribe_everything.util import is_media_file
 
 
@@ -102,19 +104,35 @@ def _run_witch_callback(
     return None
 
 
-def run(args: Args) -> tuple[int, Exception | None]:
-
-    count = 0
+def _begin_run_async(args: Args) -> list[Future[Exception | None]]:
+    futures: list[Future[Exception | None]] = []
 
     def task(file: FSPath, dst: FSPath) -> Exception | None:
-        nonlocal count
-        err = transcribe(file, dst)
-        count += 1
-        return err
+        futures.append(transcribe_async(file, dst))
+        return None
 
-    err = _run_witch_callback(args, task)
-    if err:
-        import warnings
+    setup_error = _run_witch_callback(args, task)
+    if setup_error:
+        warnings.warn(f"Error: {setup_error}")
+    return futures
 
-        warnings.warn(f"Error: {err}")
+
+def run(args: Args) -> tuple[int, Exception | None]:
+    count = 0
+    futures: list[Future[Exception | None]] = _begin_run_async(args)
+    errors: list[Exception] = []
+    for future in futures:
+        err = future.result()
+        if err:
+            warnings.warn(f"Error: {err}")
+            errors.append(err)
+        else:
+            count += 1
+    if errors:
+        return count, Exception(f"Multiple exceptions: {errors}", errors)
+    exception = (
+        None if not errors else Exception(f"Multiple exceptions: {errors}", errors)
+    )
+    return count, exception
+
     return count, err

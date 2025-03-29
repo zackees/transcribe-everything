@@ -3,6 +3,7 @@ Unit test file.
 """
 
 import unittest
+from concurrent.futures import Future
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -12,13 +13,20 @@ from transcribe_everything.args import Args
 COMMAND = "transcribe_everything"
 
 
+def _fake_transcribe_async(src: Path, dst: Path) -> Future:
+    """Dummy future callback."""
+    out = Future()
+    out.set_result(None)
+    return out
+
+
 class MainTester(unittest.TestCase):
     """Main tester class."""
 
     def setUp(self):
         """Run before tests."""
         # Monkey patch so that the test doesn't fail with fake files.
-        run.transcribe = lambda src, dst: None
+        run.transcribe_async = _fake_transcribe_async
 
     def test_demo_run_with_real_fs(self) -> None:
         """Test command line interface (CLI)."""
