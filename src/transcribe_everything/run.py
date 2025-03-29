@@ -61,9 +61,8 @@ class Batch:
 def find_batches(args: Args) -> list[Batch]:
     max_batches = args.max_batches
     vfs_src = Vfs.begin(src=args.src)
-    vfs_dst = Vfs.begin(src=args.dst)
 
-    with vfs_src, vfs_dst:
+    with vfs_src:
         batches: list[Batch] = []
 
         with vfs_src.walk_begin() as walker:

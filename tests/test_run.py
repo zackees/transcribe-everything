@@ -17,7 +17,6 @@ class MainTester(unittest.TestCase):
         """Test command line interface (CLI)."""
         args: Args = Args(
             src="dst:TorrentBooks/podcast",
-            dst="dst:TorrentBooks/podcast",
             max_batches=1,
             batch_size=1,
         )

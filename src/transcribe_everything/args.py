@@ -9,7 +9,6 @@ from dataclasses import dataclass
 @dataclass
 class Args:
     src: str
-    dst: str
     batch_size: int
     max_batches: int
 
@@ -19,17 +18,11 @@ class Args:
 
     def __post_init__(self):
         assert isinstance(self.src, str), f"Expected str, got {type(self.src)}"
-        assert (
-            isinstance(self.dst, str) or self.dst is None
-        ), f"Expected str or None, got {type(self.dst)}"
 
 
 def _parse_args() -> Args:
     parser = argparse.ArgumentParser(description="Transcribe everything.")
     parser.add_argument("src", type=str, help="Source path.")
-    parser.add_argument(
-        "dst", type=str, help="Destination path (can be the same as src)"
-    )
     parser.add_argument(
         "--batch-size",
         type=int,
@@ -44,6 +37,4 @@ def _parse_args() -> Args:
     )
 
     tmp = parser.parse_args()
-    return Args(
-        src=tmp.src, dst=tmp.dst, batch_size=tmp.batch_size, max_batches=tmp.max_batches
-    )
+    return Args(src=tmp.src, batch_size=tmp.batch_size, max_batches=tmp.max_batches)

@@ -16,7 +16,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     src = "dst:TorrentBooks/podcast"
-    dst = "dst:TorrentBooks/podcast"
     sys.argv.append(src)
-    sys.argv.append(dst)
     sys.exit(main())
