@@ -4,7 +4,7 @@ Main entry point.
 
 import sys
 
-from transcribe_everything.cli_args import Args
+from transcribe_everything.args import Args
 from transcribe_everything.run import run
 
 
