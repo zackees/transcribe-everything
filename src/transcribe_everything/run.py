@@ -10,7 +10,7 @@ from typing import Callable, Iterator
 from virtual_fs import FSPath, Vfs
 
 from transcribe_everything.args import Args
-from transcribe_everything.transcribe import transcribe_async
+from transcribe_everything.transcription_pipeline import transcribe_async
 from transcribe_everything.util import is_media_file
 
 

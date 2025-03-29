@@ -33,6 +33,8 @@ _THREAD_POOL_DOWNLOAD = ThreadPoolExecutor(max_workers=_N_DOWNLOADERS)
 _THREAD_POOL_TRANSCRIBE = ThreadPoolExecutor(max_workers=_N_TRANSCRIBERS)
 _THREAD_POOL_TOP_LEVEL = ThreadPoolExecutor(max_workers=_N_TOP_LEVEL)
 
+_COUNT = 0
+
 
 def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
     # print(f"Transcribing {src} to {dst}")
@@ -102,6 +104,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
             task_transcribe=task_transcribe,
             task_upload=task_upload,
         ) -> Exception | None:
+            global _COUNT
             logger.info(f"START TOP level transcritpion pipeline of {src} to {dst}")
             with tmpobj:
                 try:
@@ -114,11 +117,14 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                     err = _THREAD_POOL_UPLOAD.submit(task_upload).result()
                     if err:
                         return err
+                    _COUNT += 1
+                    count = _COUNT
                     logger.info(
                         f"\n###################################################################\n"
                         f"# SUCCESS! TOP level transcription pipeline finished for conversion of:\n"
                         f"# {src} ->\n"
                         f"# {dst}\n"
+                        f"# Count: {count}\n"
                         f"###################################################################\n"
                     )
                 except Exception as e:
