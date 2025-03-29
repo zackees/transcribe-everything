@@ -2,9 +2,9 @@
 Main entry point.
 """
 
+import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from transcribe_anything import transcribe_anything
 from virtual_fs import FSPath
@@ -13,6 +13,7 @@ from transcribe_everything.util import is_media_file
 
 _MODEL = "large"
 _DEVICE = "insane"
+_TEMP_DIR = Path(".tmp")
 
 _N_TRANSCRIBERS = 1
 _N_UPLOADERS = 2 * _N_TRANSCRIBERS
@@ -25,33 +26,54 @@ _THREAD_POOL_TRANSCRIBE = ThreadPoolExecutor(max_workers=_N_TRANSCRIBERS)
 _THREAD_POOL_TOP_LEVEL = ThreadPoolExecutor(max_workers=_N_TOP_LEVEL)
 
 
-def transcribe(src: FSPath, dst: FSPath) -> Exception | None:
-    print(f"Transcribing {src} to {dst}")
-    try:
-        assert is_media_file(src.suffix), f"Expected .mp3, got {src.suffix}"
-        assert dst.suffix == ".txt", f"Expected .txt, got {dst.suffix}"
-        # move file to temp location
-        with TemporaryDirectory() as tmpdir:
-            filename = Path(src.path).name
-            tmp = Path(tmpdir)
-            dst_tmp = tmp / filename
-            dst_txt = dst_tmp.with_suffix(".txt")
-            src_bytes = src.read_bytes()
-            dst_tmp.write_bytes(src_bytes)
-            transcribe_anything(
-                url_or_file=dst_tmp.as_posix(),
-                output_dir=tmp.as_posix(),
-                model=_MODEL,
-                device=_DEVICE,
-            )
-            # find the transcribed file called out.txt
-            out_txt = tmp / "out.txt"
-            assert out_txt.exists(), f"Expected {out_txt} to exist"
-            # move it to the destination
-            bytes = out_txt.read_bytes()
-            dst_txt.write_bytes(bytes)
-    except Exception as e:
-        return e
+def _random_str(n: int = 10) -> str:
+    import random
+    import string
+
+    return "".join(random.choices(string.ascii_lowercase, k=n))
+
+
+class _TempDir:
+    def __init__(self):
+        self._tmpdir_path = _TEMP_DIR / _random_str()
+        self._tmpdir = str(self._tmpdir_path)
+        self._tmpdir_path.mkdir(exist_ok=True, parents=True)
+
+    def __enter__(self):
+        return self._tmpdir_path
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # TODO: atexit
+        shutil.rmtree(self._tmpdir, ignore_errors=True)
+
+
+# def transcribe(src: FSPath, dst: FSPath) -> Exception | None:
+#     print(f"Transcribing {src} to {dst}")
+#     try:
+#         assert is_media_file(src.suffix), f"Expected .mp3, got {src.suffix}"
+#         assert dst.suffix == ".txt", f"Expected .txt, got {dst.suffix}"
+#         # move file to temp location
+#         with TemporaryDirectory() as tmpdir:
+#             filename = Path(src.path).name
+#             tmp = Path(tmpdir)
+#             dst_tmp = tmp / filename
+#             dst_txt = dst_tmp.with_suffix(".txt")
+#             src_bytes = src.read_bytes()
+#             dst_tmp.write_bytes(src_bytes)
+#             transcribe_anything(
+#                 url_or_file=dst_tmp.as_posix(),
+#                 output_dir=tmp.as_posix(),
+#                 model=_MODEL,
+#                 device=_DEVICE,
+#             )
+#             # find the transcribed file called out.txt
+#             out_txt = tmp / "out.txt"
+#             assert out_txt.exists(), f"Expected {out_txt} to exist"
+#             # move it to the destination
+#             bytes = out_txt.read_bytes()
+#             dst_txt.write_bytes(bytes)
+#     except Exception as e:
+#         return e
 
 
 def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
@@ -60,7 +82,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
         assert is_media_file(src.suffix), f"Expected .mp3, got {src.suffix}"
         assert dst.suffix == ".txt", f"Expected .txt, got {dst.suffix}"
         # move file to temp location
-        with TemporaryDirectory() as tmpdir:
+        with _TempDir() as tmpdir:
             filename = Path(src.path).name
             tmp = Path(tmpdir)
             dst_tmp = tmp / filename
