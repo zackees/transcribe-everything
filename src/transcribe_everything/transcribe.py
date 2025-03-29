@@ -15,9 +15,16 @@ from transcribe_everything.util import is_media_file
 
 logger = getLogger(__name__)
 
-_MODEL = "large"
+_MODEL = "large-v3"
 _DEVICE = "insane"
 _TEMP_DIR = Path(".tmp")
+
+
+_OTHER_ARGS = [
+    "--batch-size",
+    str(8),
+]
+
 
 _N_TRANSCRIBERS = 1
 _N_UPLOADERS = 2 * _N_TRANSCRIBERS
@@ -117,6 +124,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                     output_dir=output_dir,
                     model=model,
                     device=device,
+                    other_args=_OTHER_ARGS,
                 )
                 logger.info(f"FINISHED transcribing {url_or_file}")
             except Exception as e:
