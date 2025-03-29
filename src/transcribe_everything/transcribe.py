@@ -95,7 +95,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
         filename = Path(src.path).name
         tmp = Path(tmpdir)
         dst_tmp = tmp / filename
-        dst_txt = dst_tmp.with_suffix(".txt")
+        dst_txt = dst.with_suffix(".txt")
 
         # find the transcribed file called out.txt
         out_txt = tmp / "out.txt"

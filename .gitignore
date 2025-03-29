@@ -145,3 +145,4 @@ uv.lock
 !.aider.conf.yml
 !.aiderignore
 .tmp
+run.py 
