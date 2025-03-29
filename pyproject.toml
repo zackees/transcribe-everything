@@ -14,7 +14,7 @@ dynamic = ["version"]
 
 dependencies = [
     "transcribe-anything>=3.0.4",
-    "virtual-fs>=1.0.17",
+    "virtual-fs>=1.0.18",
 ]
 [tool.setuptools]
 package-dir = {"" = "src"}
