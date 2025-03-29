@@ -10,6 +10,7 @@ from dataclasses import dataclass
 class Args:
     src: str
     dst: str
+    batch_size: int
 
     @staticmethod
     def parse_args() -> "Args":
@@ -28,9 +29,16 @@ def _parse_args() -> Args:
     parser.add_argument(
         "dst", type=str, help="Destination path (can be the same as src)"
     )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=10,
+        help="Maximum number of files to process in a batch.",
+    )
 
     tmp = parser.parse_args()
     return Args(
         src=tmp.src,
         dst=tmp.dst,
+        batch_size=tmp.batch_size,
     )
