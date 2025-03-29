@@ -15,7 +15,7 @@ COMMAND = "transcribe_everything"
 class MainTester(unittest.TestCase):
     """Main tester class."""
 
-    def test_imports(self) -> None:
+    def test_demo_run_with_real_fs(self) -> None:
         """Test command line interface (CLI)."""
 
         with TemporaryDirectory() as tmpdir:
