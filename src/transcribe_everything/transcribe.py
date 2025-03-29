@@ -14,11 +14,15 @@ from transcribe_everything.util import is_media_file
 _MODEL = "large"
 _DEVICE = "insane"
 
+_N_TRANSCRIBERS = 1
+_N_UPLOADERS = 2 * _N_TRANSCRIBERS
+_N_DOWNLOADERS = 2 * _N_TRANSCRIBERS
+_N_TOP_LEVEL = _N_UPLOADERS + _N_DOWNLOADERS + _N_TRANSCRIBERS
 
-_THREAD_POOL_TOP_LEVEL = ThreadPoolExecutor(max_workers=10)
-_THREAD_POOL_UPLOAD = ThreadPoolExecutor(max_workers=10)
-_THREAD_POOL_DOWNLOAD = ThreadPoolExecutor(max_workers=10)
-_THREAD_POOL_TRANSCRIBE = ThreadPoolExecutor(max_workers=1)
+_THREAD_POOL_UPLOAD = ThreadPoolExecutor(max_workers=_N_UPLOADERS)
+_THREAD_POOL_DOWNLOAD = ThreadPoolExecutor(max_workers=_N_DOWNLOADERS)
+_THREAD_POOL_TRANSCRIBE = ThreadPoolExecutor(max_workers=_N_TRANSCRIBERS)
+_THREAD_POOL_TOP_LEVEL = ThreadPoolExecutor(max_workers=_N_TOP_LEVEL)
 
 
 def transcribe(src: FSPath, dst: FSPath) -> Exception | None:
