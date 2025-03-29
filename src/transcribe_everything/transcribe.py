@@ -2,8 +2,6 @@
 Main entry point.
 """
 
-import os
-import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
 from logging import getLogger
 from pathlib import Path
@@ -11,23 +9,19 @@ from pathlib import Path
 from transcribe_anything import transcribe_anything
 from virtual_fs import FSPath
 
+from transcribe_everything.tmpdir import TempDir
 from transcribe_everything.util import get_language, is_media_file
 
 logger = getLogger(__name__)
 
-_PROCESS_ID = os.getpid()
 
 _MODEL = "large-v3"
 _DEVICE = "insane"
-_TEMP_DIR = Path(".tmp")
-_THIS_TEMP_DIR = _TEMP_DIR / f"{_PROCESS_ID}"
-
 
 _OTHER_ARGS = [
     "--batch-size",
     str(8),
 ]
-
 
 _N_TRANSCRIBERS = 1
 _N_UPLOADERS = 2 * _N_TRANSCRIBERS
@@ -38,27 +32,6 @@ _THREAD_POOL_UPLOAD = ThreadPoolExecutor(max_workers=_N_UPLOADERS)
 _THREAD_POOL_DOWNLOAD = ThreadPoolExecutor(max_workers=_N_DOWNLOADERS)
 _THREAD_POOL_TRANSCRIBE = ThreadPoolExecutor(max_workers=_N_TRANSCRIBERS)
 _THREAD_POOL_TOP_LEVEL = ThreadPoolExecutor(max_workers=_N_TOP_LEVEL)
-
-
-def _random_str(n: int = 10) -> str:
-    import random
-    import string
-
-    return "".join(random.choices(string.ascii_lowercase, k=n))
-
-
-class _TempDir:
-    def __init__(self):
-        self._tmpdir_path = _THIS_TEMP_DIR / _random_str()
-        self._tmpdir = str(self._tmpdir_path)
-        self._tmpdir_path.mkdir(exist_ok=True, parents=True)
-
-    def __enter__(self):
-        return self._tmpdir_path
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # TODO: atexit
-        shutil.rmtree(self._tmpdir, ignore_errors=True)
 
 
 def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
@@ -74,9 +47,8 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
         assert is_media_file(src.suffix), f"Expected media file got {src.suffix}"
         assert dst.suffix == ".txt", f"Expected .txt, got {dst.suffix}"
         # Prepare data context for the pipeline.
-        tmpobj = (
-            _TempDir()
-        )  # This will be opened and finally exited during the lifespan of the active job.
+        tmpobj = TempDir()
+        # TempDir will be opened and finally exited during the lifespan of the active job.
         tmpdir = tmpobj._tmpdir_path
         filename = Path(src.path).name
         tmp = Path(tmpdir)
