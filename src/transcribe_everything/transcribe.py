@@ -143,7 +143,11 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                     if err:
                         return err
                     logger.info(
-                        f"FINISHED TOP level transcription pipeline of {src} to {dst}"
+                        f"\n###################################################################\n"
+                        f"# SUCCESS! TOP level transcription pipeline finished for conversion of:\n"
+                        f"# {src} ->\n"
+                        f"# {dst}\n"
+                        f"###################################################################\n"
                     )
                 except Exception as e:
                     logger.error(
