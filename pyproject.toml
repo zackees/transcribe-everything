@@ -45,4 +45,4 @@ profile = "black"
 
 
 [project.scripts]
-transcribe_everything = "transcribe_everything.cli:main"
+transcribe-everything = "transcribe_everything.cli:main"
