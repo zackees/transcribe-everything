@@ -58,7 +58,8 @@ class Batch:
         return iter(self.unprocessed())
 
 
-def find_files(args: Args) -> list[Batch]:
+def find_batches(args: Args) -> list[Batch]:
+    max_batches = args.max_batches
     vfs_src = Vfs.begin(src=args.src)
     vfs_dst = Vfs.begin(src=args.dst)
 
@@ -67,12 +68,16 @@ def find_files(args: Args) -> list[Batch]:
 
         with vfs_src.walk_begin() as walker:
             for root, _, files in walker:
+                if len(batches) >= max_batches:
+                    return batches
                 media_files: list[FSPath] = []
                 for file in files:
                     if is_media_file(file):
                         media_files.append(root / file)
                 if len(media_files) > 0:
-                    batches.append(Batch(files=media_files, root=root))
+                    batch = Batch(files=media_files, root=root)
+                    if batch:
+                        batches.append(batch)
     return batches
 
 
@@ -81,7 +86,7 @@ def _run_witch_callback(
 ) -> Exception | None:
     try:
         batch_size = args.batch_size
-        batches = find_files(args)
+        batches = find_batches(args)
 
         for batch in batches:
             unprocessed = batch.unprocessed()[:batch_size]

@@ -11,6 +11,7 @@ class Args:
     src: str
     dst: str
     batch_size: int
+    max_batches: int
 
     @staticmethod
     def parse_args() -> "Args":
@@ -35,10 +36,14 @@ def _parse_args() -> Args:
         default=10,
         help="Maximum number of files to process in a batch.",
     )
+    parser.add_argument(
+        "--max-batches",
+        type=int,
+        default=10,
+        help="Maximum number of batches to process.",
+    )
 
     tmp = parser.parse_args()
     return Args(
-        src=tmp.src,
-        dst=tmp.dst,
-        batch_size=tmp.batch_size,
+        src=tmp.src, dst=tmp.dst, batch_size=tmp.batch_size, max_batches=tmp.max_batches
     )
