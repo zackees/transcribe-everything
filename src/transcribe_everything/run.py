@@ -5,6 +5,7 @@ Main entry point.
 import warnings
 from concurrent.futures import Future
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable, Iterator
 
 from virtual_fs import FSPath, Vfs
@@ -47,6 +48,7 @@ class Batch:
             out = out[:max_size]
         return out
 
+
     def processed(self) -> list[FSPath]:
         return [file.with_suffix(".txt") for file in self.files]
 
@@ -81,8 +83,17 @@ def find_batches(args: Args) -> list[Batch]:
                         batches.append(batch)
     return batches
 
+_ERROR_SET: set[FSPath] = set()
 
-def _run_witch_callback(
+def _file_had_error_store(file: FSPath) -> None:
+    # Check if the file has a .txt suffix and if it exists
+    return _ERROR_SET.add(file)
+
+def _file_had_error(file: FSPath) -> bool:
+    # Check if the file has a .txt suffix and if it exists
+    return file in _ERROR_SET
+
+def _run_with_callback(
     args: Args, callback: Callable[[FSPath, FSPath], Exception | None]
 ) -> Exception | None:
     exceptions: list[Exception] = []
@@ -91,11 +102,17 @@ def _run_witch_callback(
         batches = find_batches(args)
 
         for batch in batches:
-            unprocessed = batch.unprocessed()[:batch_size]
+            unprocessed = batch.unprocessed()
+            # filter files that have already been processed
+            unprocessed = [file for file in unprocessed if not _file_had_error(file)]
+            unprocessed = unprocessed[:batch_size]
+            file: FSPath
             for file in unprocessed:
                 dst_file = file.with_suffix(".txt")
                 err = callback(file, dst_file)
                 if err:
+                    # store the error
+                    _file_had_error_store(file)
                     exceptions.append(err)
     except Exception as e:
         exceptions.append(e)
@@ -111,7 +128,7 @@ def _begin_run_async(args: Args) -> list[Future[Exception | None]]:
         futures.append(transcribe_async(file, dst))
         return None
 
-    setup_error = _run_witch_callback(args, task)
+    setup_error = _run_with_callback(args, task)
     if setup_error:
         warnings.warn(f"Error: {setup_error}")
     return futures
