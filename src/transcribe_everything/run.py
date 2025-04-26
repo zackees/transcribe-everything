@@ -83,15 +83,24 @@ def find_batches(args: Args) -> list[Batch]:
                         batches.append(batch)
     return batches
 
-_ERROR_SET: set[FSPath] = set()
+# _ERROR_SET: set[FSPath] = set()
 
-def _file_had_error_store(file: FSPath) -> None:
-    # Check if the file has a .txt suffix and if it exists
-    return _ERROR_SET.add(file)
+# def _file_had_error_store(file: FSPath) -> None:
+#     # Check if the file has a .txt suffix and if it exists
+#     return _ERROR_SET.add(file)
 
-def _file_had_error(file: FSPath) -> bool:
+# def _file_had_error(file: FSPath) -> bool:
+#     # Check if the file has a .txt suffix and if it exists
+#     return file in _ERROR_SET
+
+_PROCESSED_SET: set[FSPath] = set()
+def _mark_file_processed(file: FSPath) -> None:
     # Check if the file has a .txt suffix and if it exists
-    return file in _ERROR_SET
+    _PROCESSED_SET.add(file)
+
+def _file_was_processed(file: FSPath) -> bool:
+    # Check if the file has a .txt suffix and if it exists
+    return file in _PROCESSED_SET
 
 def _run_with_callback(
     args: Args, callback: Callable[[FSPath, FSPath], Exception | None]
@@ -104,15 +113,15 @@ def _run_with_callback(
         for batch in batches:
             unprocessed = batch.unprocessed()
             # filter files that have already been processed
-            unprocessed = [file for file in unprocessed if not _file_had_error(file)]
+            unprocessed = [file for file in unprocessed if not _file_was_processed(file)]
+            for file in unprocessed:
+                _mark_file_processed(file)
             unprocessed = unprocessed[:batch_size]
             file: FSPath
             for file in unprocessed:
                 dst_file = file.with_suffix(".txt")
                 err = callback(file, dst_file)
                 if err:
-                    # store the error
-                    _file_had_error_store(file)
                     exceptions.append(err)
     except Exception as e:
         exceptions.append(e)
