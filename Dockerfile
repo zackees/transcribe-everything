@@ -32,14 +32,14 @@ RUN uv venv
 RUN uv pip install transcribe-everything
 
 # Force install ffmpeg
-RUN static_ffmpeg -version
+RUN uv run static_ffmpeg -version
 
 
 # Install the transcriber.
 RUN uv pip install transcribe-everything==1.5.20
 
 # Get all the one time installs out of the way.
-RUN transcribe-everything-init
+RUN uv run transcribe-everything-init
 
 # copy your rclone config
 COPY rclone.conf .

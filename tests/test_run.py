@@ -34,7 +34,7 @@ class MainTester(unittest.TestCase):
         with TemporaryDirectory() as tmpdir:
             cwd: Path = Path(tmpdir)
             (cwd / "test.mp4").touch()
-            (cwd / "test.txt").touch()
+            # (cwd / "test.txt").touch()
             (cwd / "test.mp3").touch()
             args: Args = Args(
                 src=cwd.as_posix(),
@@ -44,6 +44,10 @@ class MainTester(unittest.TestCase):
             )
             count, err = run.run(args)
             self.assertEqual(1, count)
+            self.assertIsNone(err)
+            (cwd / "test.txt").touch()
+            count, err = run.run(args)
+            self.assertEqual(0, count)  # because test.txt already exists.
             self.assertIsNone(err)
 
 

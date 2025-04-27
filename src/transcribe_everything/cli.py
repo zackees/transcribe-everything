@@ -32,7 +32,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    src = "dst:TorrentBooks/podcast/CoffeeAndAMike"
+    src = "dst:TorrentBooks/podcast/dialogueworks01"
     sys.argv.append(src)
     sys.argv.append("--batch-size")
     sys.argv.append("20")
