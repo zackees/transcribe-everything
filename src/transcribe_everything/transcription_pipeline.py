@@ -3,6 +3,7 @@ Main entry point.
 """
 
 from concurrent.futures import Future, ThreadPoolExecutor
+from datetime import datetime
 from logging import getLogger
 from pathlib import Path
 
@@ -34,6 +35,9 @@ _THREAD_POOL_TRANSCRIBE = ThreadPoolExecutor(max_workers=_N_TRANSCRIBERS)
 _THREAD_POOL_TOP_LEVEL = ThreadPoolExecutor(max_workers=_N_TOP_LEVEL)
 
 _COUNT = 0
+
+
+_START_TIME = datetime.now()
 
 
 def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
@@ -119,12 +123,16 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                         return err
                     _COUNT += 1
                     count = _COUNT
+                    hours_running = (
+                        _START_TIME - datetime.now()
+                    ).total_seconds() / 3600
                     logger.info(
                         f"\n###################################################################\n"
                         f"# SUCCESS! TOP level transcription pipeline finished for conversion of:\n"
                         f"# {src} ->\n"
                         f"# {dst}\n"
                         f"# Count: {count}\n"
+                        f"# Time running: {hours_running:.2f} hours\n"
                         f"###################################################################\n"
                     )
                 except Exception as e:
