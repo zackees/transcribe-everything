@@ -11,6 +11,7 @@ class Args:
     src: str
     batch_size: int
     max_batches: int
+    randomize: bool
 
     @staticmethod
     def parse_args() -> "Args":
@@ -35,6 +36,16 @@ def _parse_args() -> Args:
         default=10,
         help="Maximum number of batches to process.",
     )
+    parser.add_argument(
+        "--no-randomize",
+        action="store_true",
+        default=False,
+    )
 
     tmp = parser.parse_args()
-    return Args(src=tmp.src, batch_size=tmp.batch_size, max_batches=tmp.max_batches)
+    return Args(
+        src=tmp.src,
+        batch_size=tmp.batch_size,
+        max_batches=tmp.max_batches,
+        randomize=not tmp.no_randomize,
+    )

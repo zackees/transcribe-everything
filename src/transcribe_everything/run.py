@@ -110,6 +110,11 @@ def _run_with_callback(
         batch_size = args.batch_size
         batches = find_batches(args)
 
+        if args.randomize:
+            import random
+
+            random.shuffle(batches)
+
         for batch in batches:
             unprocessed = batch.unprocessed()
             # filter files that have already been processed

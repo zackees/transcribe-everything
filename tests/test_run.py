@@ -40,6 +40,7 @@ class MainTester(unittest.TestCase):
                 src=cwd.as_posix(),
                 max_batches=1,
                 batch_size=1,
+                randomize=False,
             )
             count, err = run.run(args)
             self.assertEqual(1, count)
