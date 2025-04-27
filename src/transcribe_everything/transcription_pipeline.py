@@ -124,7 +124,7 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                     _COUNT += 1
                     count = _COUNT
                     hours_running = (
-                        _START_TIME - datetime.now()
+                        datetime.now() - _START_TIME
                     ).total_seconds() / 3600
                     logger.info(
                         f"\n###################################################################\n"
