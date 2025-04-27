@@ -11,8 +11,9 @@ from pathlib import Path
 from transcribe_anything import transcribe_anything
 from virtual_fs import FSPath
 
+from transcribe_everything.lang import get_language
 from transcribe_everything.tmpdir import TempDir
-from transcribe_everything.util import get_language, is_media_file
+from transcribe_everything.util import is_media_file
 
 logger = getLogger(__name__)
 

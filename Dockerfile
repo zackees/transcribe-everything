@@ -35,11 +35,16 @@ RUN uv pip install transcribe-everything
 RUN uv run static_ffmpeg -version
 
 
+
 # Install the transcriber.
-RUN uv pip install transcribe-everything==1.5.20
+RUN uv pip install transcribe-everything>=1.5.21
+
+# wherever you activate your conda env…
+ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:${LD_LIBRARY_PATH}
+
 
 # Get all the one time installs out of the way.
-RUN uv run transcribe-everything-init
+# RUN uv run transcribe-everything-init
 
 # copy your rclone config
 COPY rclone.conf .
