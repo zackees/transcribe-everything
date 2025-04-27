@@ -13,3 +13,6 @@ Transcribes everything!
 
   * GPU benchmark to prove GPU mode works
     * `docker run --rm -it --gpus=all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
+
+
+    * # dst:TorrentBooks/podcast/dialogueworks01/youtube/Andrei_Martyanov_on_Scott_Ritter_and_Russia_Braces_as_NATOs_Desperation_Grows.txt
