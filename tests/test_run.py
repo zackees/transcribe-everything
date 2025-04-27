@@ -28,13 +28,12 @@ class MainTester(unittest.TestCase):
         # Monkey patch so that the test doesn't fail with fake files.
         run.transcribe_async = _fake_transcribe_async
 
-    def test_demo_run_with_real_fs(self) -> None:
+    def test_demo_will_return_unprocessed_translation(self) -> None:
         """Test command line interface (CLI)."""
 
         with TemporaryDirectory() as tmpdir:
             cwd: Path = Path(tmpdir)
             (cwd / "test.mp4").touch()
-            # (cwd / "test.txt").touch()
             (cwd / "test.mp3").touch()
             args: Args = Args(
                 src=cwd.as_posix(),
@@ -45,9 +44,23 @@ class MainTester(unittest.TestCase):
             count, err = run.run(args)
             self.assertEqual(1, count)
             self.assertIsNone(err)
+
+    def test_demo_run_will_not_return_processed_translation(self) -> None:
+        """Test command line interface (CLI)."""
+
+        with TemporaryDirectory() as tmpdir:
+            cwd: Path = Path(tmpdir)
+            (cwd / "test.mp4").touch()
             (cwd / "test.txt").touch()
+            (cwd / "test.mp3").touch()
+            args: Args = Args(
+                src=cwd.as_posix(),
+                max_batches=1,
+                batch_size=1,
+                randomize=False,
+            )
             count, err = run.run(args)
-            self.assertEqual(0, count)  # because test.txt already exists.
+            self.assertEqual(0, count)
             self.assertIsNone(err)
 
 
