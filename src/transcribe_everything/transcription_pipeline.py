@@ -2,6 +2,7 @@
 Main entry point.
 """
 
+import os
 from concurrent.futures import Future, ThreadPoolExecutor
 from datetime import datetime
 from logging import getLogger
@@ -24,9 +25,21 @@ _OTHER_ARGS = [
     str(8),
 ]
 
-_N_TRANSCRIBERS = 1
-_N_UPLOADERS = 2 * _N_TRANSCRIBERS
-_N_DOWNLOADERS = 2 * _N_TRANSCRIBERS
+
+def get_n_transcribers() -> int:
+    """Get the number of transcribers."""
+    try:
+        return int(os.environ.get("TRANSCRIBE_EVERYTHING_N_TRANSCRIBERS", 1))
+    except ValueError:
+        logger.warning(
+            "TRANSCRIBE_EVERYTHING_N_TRANSCRIBERS is not an integer, using default value of 1"
+        )
+        return 1
+
+
+_N_TRANSCRIBERS = get_n_transcribers()
+_N_UPLOADERS = _N_TRANSCRIBERS + 2
+_N_DOWNLOADERS = _N_UPLOADERS
 _N_TOP_LEVEL = _N_UPLOADERS + _N_DOWNLOADERS + _N_TRANSCRIBERS
 
 _THREAD_POOL_UPLOAD = ThreadPoolExecutor(max_workers=_N_UPLOADERS)

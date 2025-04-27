@@ -135,7 +135,7 @@ def _run_with_callback(
     return None
 
 
-def _begin_run_async(args: Args) -> list[Future[Exception | None]]:
+def _run_async(args: Args) -> list[Future[Exception | None]]:
     futures: list[Future[Exception | None]] = []
 
     def task(file: FSPath, dst: FSPath) -> Exception | None:
@@ -150,7 +150,7 @@ def _begin_run_async(args: Args) -> list[Future[Exception | None]]:
 
 def run(args: Args) -> tuple[int, Exception | None]:
     count = 0
-    futures: list[Future[Exception | None]] = _begin_run_async(args)
+    futures: list[Future[Exception | None]] = _run_async(args)
     errors: list[Exception] = []
     for future in futures:
         err = future.result()

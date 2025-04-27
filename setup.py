@@ -18,6 +18,6 @@ if __name__ == "__main__":
         maintainer="Zachary Vorhies",
         keywords=KEYWORDS,
         url=URL,
-        package_data={"": ["assets/example.txt"]},
+        package_data={"": ["assets/sample.mp3"]},
         include_package_data=True)
 

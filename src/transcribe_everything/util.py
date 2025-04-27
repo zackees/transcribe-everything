@@ -16,6 +16,8 @@ def _name_without_suffix(name: str) -> str:
 
 
 def get_language(text: str) -> str:
+    if len(text) < 20:
+        return "en"
     text = _name_without_suffix(text)
     text = text.replace("_", " ")
     return detect(text)
