@@ -11,7 +11,7 @@ from pathlib import Path
 from transcribe_anything import transcribe_anything
 from virtual_fs import FSPath
 
-from transcribe_everything.lang import get_language
+from transcribe_everything.lang import get_language, is_english
 from transcribe_everything.tmpdir import TempDir
 from transcribe_everything.util import is_media_file
 
@@ -57,10 +57,10 @@ _START_TIME = datetime.now()
 def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
     # print(f"Transcribing {src} to {dst}")
 
-    lang = get_language(src.name)
-    if lang != "en":
+    if not is_english(src.name):
+        lang = get_language(src.name)
         logger.info(
-            f"Skipping {src} because the file title appears not to be in English, was instead {lang}"
+            f"Skipping {src} because the file title appears not to be in English.\nThe language detector says this name is {lang}"
         )
         return _THREAD_POOL_TRANSCRIBE.submit(lambda: None)
     try:
