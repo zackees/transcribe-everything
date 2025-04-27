@@ -35,5 +35,5 @@ if __name__ == "__main__":
     src = "dst:TorrentBooks/podcast/CoffeeAndAMike"
     sys.argv.append(src)
     sys.argv.append("--batch-size")
-    sys.argv.append("300")
+    sys.argv.append("20")
     sys.exit(main())
