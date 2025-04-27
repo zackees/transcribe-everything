@@ -16,13 +16,13 @@ from transcribe_everything.util import get_language, is_media_file
 
 logger = getLogger(__name__)
 
-
-_MODEL = "large-v3"
-_DEVICE = "insane"
+_MODEL = os.environ.get("TRANSCRIBE_EVERYTHING_MODEL", "large-v3")
+_DEVICE = os.environ.get("TRANSCRIBE_EVERYTHING_DEVICE", "insane")
+_BATCH_SIZE = os.environ.get("TRANSCRIBE_EVERYTHING_BATCH_SIZE", 8)
 
 _OTHER_ARGS = [
     "--batch-size",
-    str(8),
+    str(_BATCH_SIZE),
 ]
 
 

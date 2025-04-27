@@ -11,11 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# copy your rclone config
-COPY rclone.conf .
+
 
 # install exactly your transcriber
-RUN pip install --no-cache-dir transcribe-everything==1.5.19
+RUN pip install --no-cache-dir transcribe-everything==1.5.20
+
+RUN transcribe-everything-init
 
 ENTRYPOINT ["transcribe-everything"]
 
