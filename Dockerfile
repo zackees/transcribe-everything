@@ -10,7 +10,8 @@ RUN apt-get update -y
 
 # install any extra system deps
 RUN apt-get install -y build-essential
-RUN apt-get install -y curl
+RUN apt-get install -y curl dos2unix
+
 
 RUN distribution=$(. /etc/os-release;echo  $ID$VERSION_ID)  && \
     curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | apt-key add -  && \
@@ -51,14 +52,18 @@ ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/
 # ./opt/conda/lib/python3.11/site-packages/nvidia/cudnn/lib/
 # 
 
+COPY . .
+RUN uv pip install -e .
 
 # Get all the one time installs out of the way.
 # RUN uv run transcribe-everything-init
 
+
 # copy your rclone config
 COPY rclone.conf .
+RUN chmod +x entrypoint.sh && dos2unix entrypoint.sh
 
-ENTRYPOINT ["uv", "run", "transcribe-everything"]
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # This path is a rclone style remote path. You must have rclone.conf file
 # side by side with this program.

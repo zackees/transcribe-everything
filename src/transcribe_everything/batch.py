@@ -12,14 +12,6 @@ from transcribe_everything.args import Args
 from transcribe_everything.util import is_media_file
 
 
-def _is_in_set_membership_emulated(file: FSPath, set_: list[FSPath]) -> bool:
-    """Check if the file is in the set."""
-    for item in set_:
-        if file == item:
-            return True
-    return False
-
-
 def _reduce(files: list[FSPath]) -> list[FSPath]:
     # take all the media files, remove the suffix, add .txt. If that file
     # exists then remove it from the list
@@ -30,7 +22,6 @@ def _reduce(files: list[FSPath]) -> list[FSPath]:
         print(f"  {file}")
     print("Now checking each file.")
     for file in files:
-        print(f"Checking {file}")
         if not is_media_file(file.name):
             # print(f"  Not a media file, skipping")
             continue
