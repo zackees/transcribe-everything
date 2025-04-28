@@ -2,7 +2,7 @@ from concurrent.futures import Future
 
 from virtual_fs import FSPath, RealFS, Vfs
 
-__version__ = "1.5.23"
+__version__ = "1.5.24"
 
 
 class Api:

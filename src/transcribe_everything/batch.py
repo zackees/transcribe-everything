@@ -17,9 +17,9 @@ def _reduce(files: list[FSPath]) -> list[FSPath]:
     # exists then remove it from the list
     files_set: set[FSPath] = set(files)
     files_out: list[FSPath] = []
-    print("Files: ")
-    for file in files:
-        print(f"  {file}")
+    # print("Files: ")
+    # for file in files:
+    #     print(f"  {file}")
     print("Now checking each file.")
     for file in files:
         if not is_media_file(file.name):
@@ -28,7 +28,7 @@ def _reduce(files: list[FSPath]) -> list[FSPath]:
         file_as_txt = file.with_suffix(".txt")
         file_in_set = file_as_txt in files_set
         if file_in_set:
-            print(f"  File {file_as_txt} is already done, skipping")
+            # print(f"  File {file_as_txt} is already done, skipping")
             continue
         files_out.append(file)
     return files_out
