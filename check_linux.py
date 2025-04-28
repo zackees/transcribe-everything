@@ -5,7 +5,10 @@ libraries = [
     "libcudnn.so.9",
     "libcusparseLt.so.0",
     "libcupti.so.12",
-    "libcusparse.so.12"
+    "libcusparse.so.12",
+    "libcufft.so.11",
+    "libcurand.so.10",
+    "libcublas.so.12",
 ]
 
 # ctypes.CDLL('libcudnn.so.9')
