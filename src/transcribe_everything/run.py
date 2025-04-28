@@ -10,6 +10,7 @@ from typing import Callable, Iterator
 
 from virtual_fs import FSPath
 
+from transcribe_everything import __version__
 from transcribe_everything.args import Args
 from transcribe_everything.batch import Batch, find_batches
 from transcribe_everything.transcription_pipeline import transcribe_async
@@ -80,6 +81,7 @@ def _run_async(args: Args) -> list[Future[Exception | None]]:
 
 
 def run(args: Args) -> tuple[int, Exception | None]:
+    print(f"Transcribe Everything version {__version__}")
     count = 0
     futures: list[Future[Exception | None]] = _run_async(args)
     errors: list[Exception] = []

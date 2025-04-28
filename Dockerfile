@@ -41,7 +41,10 @@ RUN uv run static_ffmpeg -version
 
 
 # Install the transcriber.
-RUN uv pip install transcribe-everything>=1.5.21
+ENV VERSION=1.5.23
+RUN uv pip install transcribe-everything>=${VERSION} \
+    || uv pip install transcribe-everything==${VERSION} \
+    || uv pip install transcribe-everything==${VERSION}
 
 # wherever you activate your conda env…
 ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib64:${LD_LIBRARY_PATH}
