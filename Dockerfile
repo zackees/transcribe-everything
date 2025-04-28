@@ -29,6 +29,10 @@ RUN pip install uv
 
 # RUN pip install --no-cache-dir transcribe-everything
 RUN uv venv
+
+# COPY pre_requirements.txt .
+# RUN uv pip install -r pre_requirements.txt
+
 RUN uv pip install transcribe-everything
 
 # Force install ffmpeg
@@ -40,7 +44,9 @@ RUN uv run static_ffmpeg -version
 RUN uv pip install transcribe-everything>=1.5.21
 
 # wherever you activate your conda env…
-ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:${LD_LIBRARY_PATH}
+ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib64:${LD_LIBRARY_PATH}
+# ./opt/conda/lib/python3.11/site-packages/nvidia/cudnn/lib/
+# 
 
 
 # Get all the one time installs out of the way.

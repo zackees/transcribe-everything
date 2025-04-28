@@ -3,6 +3,7 @@ Main entry point.
 """
 
 import os
+import traceback
 from concurrent.futures import Future, ThreadPoolExecutor
 from datetime import datetime
 from logging import getLogger
@@ -103,7 +104,8 @@ def transcribe_async(src: FSPath, dst: FSPath) -> Future[Exception | None]:
                 )
                 logger.info(f"FINISHED transcribing {url_or_file}")
             except Exception as e:
-                logger.error(f"ERROR transcribing {url_or_file}")
+                stacktrace = traceback.format_exc()
+                logger.error(f"ERROR transcribing {url_or_file}:\n{stacktrace}\n\n{e}")
                 return e
 
         def task_upload(out_txt=out_txt, dst_txt=dst_txt) -> Exception | None:
