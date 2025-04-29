@@ -1,3 +1,17 @@
+
+# Dockerfile to create the transcribe-everything image.
+# Install:
+#  docker pull niteris/transcribe-everything
+#  -or- docker build -t transcribe-everything .
+# Examples:
+#  Example 1:
+#    docker pull niteris/transcribe-everything
+#    docker run --rm -it niteris/transcribe-everything --help
+#  Example 2:
+#    docker run --rm -it -v ./rclone.conf niteris/transcribe-everything --help
+
+
+
 # pick the CUDA version your host GPU driver supports
 FROM niteris/transcribe-anything
 
@@ -20,6 +34,5 @@ RUN chmod +x entrypoint.sh && dos2unix entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# This path is a rclone style remote path. You must have rclone.conf file
-# side by side with this program.
+# Please map in the rclone conf file.
 CMD ["--help"]
