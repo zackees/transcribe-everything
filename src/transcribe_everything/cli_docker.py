@@ -26,7 +26,7 @@ def _parse_args() -> "Args":
         default=False,
     )
     parser.add_argument(
-        "--rclone-conf",
+        "--config",
         type=Path,
         default=Path("rclone.conf"),
         help="Path to rclone configuration file.",
@@ -44,6 +44,9 @@ def _parse_args() -> "Args":
     )
 
     tmp = parser.parse_args()
+    assert (
+        tmp.rclone_conf.exists()
+    ), f"Please specify --config and point to a rclone.conf file. File does not exist: {tmp.rclone_conf}"
     return Args(
         src=tmp.src,
         randomize=not tmp.no_randomize,
