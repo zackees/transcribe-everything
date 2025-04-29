@@ -110,7 +110,7 @@ def main() -> int:
         print(f"Failed to pull docker image: {rtn}")
         return 1
     print(f"Running command: {cmd_run}")
-    rtn = subprocess.call(cmd_list_run, shell=True, env=env)
+    rtn = subprocess.call(cmd_run, shell=True, env=env)
     return rtn
 
 
