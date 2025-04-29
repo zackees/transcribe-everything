@@ -2,6 +2,7 @@
 Main entry point.
 """
 
+import traceback
 import warnings
 from concurrent.futures import Future
 from dataclasses import dataclass
@@ -88,6 +89,11 @@ def run(args: Args) -> tuple[int, Exception | None]:
     for future in futures:
         err = future.result()
         if err:
+            stacktrace = err.__traceback__
+            if stacktrace:
+                tb = traceback.extract_tb(stacktrace)
+                for frame in tb:
+                    print(f"File: {frame.filename}, Line: {frame.lineno}, Function: {frame.name}")
             warnings.warn(f"Error: {err}")
             errors.append(err)
         else:
