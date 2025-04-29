@@ -107,11 +107,15 @@ def main() -> int:
 
     # if args.gpu_batch_size is not None:
     #     cmd_list_run.extend(["-e", "GPU_BATCH_SIZE=" + str(args.gpu_batch_size)])
+
     cmd_list_run: list[str] = [
         "docker",
         "run",
         "--rm",
-        "-it",
+    ]
+    if sys.stdout.isatty():
+        cmd_list_run.append("-t")
+    cmd_list_run += [
         "--gpus",
         "all",
     ]
