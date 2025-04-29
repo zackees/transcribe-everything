@@ -43,6 +43,18 @@ source $HOME/.local/bin/env
 uv venv
 uv pip install transcribe-everything
 
+# install pm2
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install -g pm2
+
+echo "#!/bin/bash" > run_transcription.sh
+echo uv run transcribe-everything-run-docker dst:TorrentBooks/podcast --gpu-batch-size 80 >> run_transcription.sh
+chmod +x run_transcription.sh
+pm2 start run_transcription.sh --name transcribe-everything
+pm2 save
+pm2 startup
+
 echo Now reboot your system to complete the installation
 echo sudo reboot
 echo Afterwards, run the following command to verify the installation:
