@@ -1,6 +1,8 @@
 # transcribe-everything
 
-Transcribes everything!
+[![Build Docker Image](https://github.com/zackees/transcribe-everything/actions/workflows/build_docker_image.yml/badge.svg)](https://github.com/zackees/transcribe-everything/actions/workflows/build_docker_image.yml)
+
+Transcribes everything! Point this solution to a remote directory and this tool will find all the media files (*.mp3, *.mp4) and if there is no *.txt present, it will be transcribed. Will continue until all files are transcribed.
 
 # Docker
   * Install
