@@ -84,6 +84,21 @@ def main() -> int:
     cmd_pull = "docker pull niteris/transcribe-everything"
     rclone_conf_str = _to_volume_path(args.rclone_conf)
 
+    # cmd_list_run: list[str] = [
+    #     "docker",
+    #     "run",
+    #     "--rm",
+    #     "-it",
+    #     "--gpus",
+    #     "all",
+    #     "-v",
+    #     rclone_conf_str,
+    #     "niteris/transcribe-everything",
+    #     args.src,
+    # ]
+
+    # if args.gpu_batch_size is not None:
+    #     cmd_list_run.extend(["-e", "GPU_BATCH_SIZE=" + str(args.gpu_batch_size)])
     cmd_list_run: list[str] = [
         "docker",
         "run",
@@ -91,15 +106,15 @@ def main() -> int:
         "-it",
         "--gpus",
         "all",
+    ]
+    if args.gpu_batch_size is not None:
+        cmd_list_run.extend(["-e", "GPU_BATCH_SIZE=" + str(args.gpu_batch_size)])
+    cmd_list_run += [
         "-v",
         rclone_conf_str,
         "niteris/transcribe-everything",
         args.src,
     ]
-
-    if args.gpu_batch_size is not None:
-        cmd_list_run.extend(["-e", "GPU_BATCH_SIZE=" + str(args.gpu_batch_size)])
-
     cmd_run = subprocess.list2cmdline(cmd_list_run)
     print(f"Running command: {cmd_pull}")
     rtn = subprocess.call(cmd_pull, shell=True)
@@ -110,6 +125,8 @@ def main() -> int:
     rtn = subprocess.call(cmd_run, shell=True)
     return rtn
 
+
+# docker run --rm -it --gpus all -e GPU_BATCH_SIZE=40 -v /root/rclone.conf:/app/rclone.conf niteris/transcribe-everything dst:TorrentBooks/podcast
 
 if __name__ == "__main__":
     import sys
