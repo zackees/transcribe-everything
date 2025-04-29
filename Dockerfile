@@ -26,36 +26,18 @@ RUN mkdir -p /etc/docker
 
 RUN nvidia-ctk runtime configure --runtime=docker
 
-RUN pip install uv
+RUN pip install transcribe-anything>=3.0.10
 
-# RUN pip install --no-cache-dir transcribe-everything
-RUN uv venv
+COPY entrypoint.sh /app/entrypoint.sh
+COPY check_linux_shared_libraries.py /app/check_linux_shared_libraries.py
 
-# COPY pre_requirements.txt .
-# RUN uv pip install -r pre_requirements.txt
+RUN /bin/bash /app/entrypoint.sh --only-check-shared-libs && transcribe-anything-init-insane
 
-RUN uv pip install transcribe-everything
-
-# Force install ffmpeg
-RUN uv run static_ffmpeg -version
-
-
-
-# Install the transcriber.
-ENV VERSION=1.5.23
-RUN uv pip install transcribe-everything>=${VERSION} \
-    || uv pip install transcribe-everything==${VERSION} \
-    || uv pip install transcribe-everything==${VERSION}
-
-# wherever you activate your conda env…
-ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:/opt/conda/lib/python3.11/site-packages/nvidia/cuda_runtime/lib64:${LD_LIBRARY_PATH}
-# ./opt/conda/lib/python3.11/site-packages/nvidia/cudnn/lib/
-# 
 
 COPY . .
 RUN uv pip install -e .
 
-# Get all the one time installs out of the way.
+# # Get all the one time installs out of the way.
 # RUN uv run transcribe-everything-init
 
 
@@ -68,5 +50,3 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 # This path is a rclone style remote path. You must have rclone.conf file
 # side by side with this program.
 CMD ["dst:TorrentBooks/podcast", "--batch-size", "20"]
-
-# 
