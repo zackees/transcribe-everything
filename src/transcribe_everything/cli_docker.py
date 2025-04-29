@@ -35,6 +35,12 @@ def _parse_args() -> "Args":
         type=int,
         required=False,
     )
+    parser.add_argument(
+        "--gpu-jobs",
+        type=int,
+        default=1,
+        help="Number of GPU jobs to run in parallel.",
+    )
 
     tmp = parser.parse_args()
     return Args(
@@ -42,6 +48,7 @@ def _parse_args() -> "Args":
         randomize=not tmp.no_randomize,
         rclone_conf=tmp.rclone_conf,
         gpu_batch_size=tmp.gpu_batch_size,
+        gpu_jobs=tmp.gpu_jobs,
     )
 
 
@@ -51,6 +58,7 @@ class Args:
     randomize: bool
     rclone_conf: Path
     gpu_batch_size: int | None
+    gpu_jobs: int
 
     @staticmethod
     def parse_args() -> "Args":
@@ -109,6 +117,8 @@ def main() -> int:
     ]
     if args.gpu_batch_size is not None:
         cmd_list_run.extend(["-e", "GPU_BATCH_SIZE=" + str(args.gpu_batch_size)])
+    if args.gpu_jobs > 1:
+        cmd_list_run.extend(["-e", "GPU_JOBS=" + str(args.gpu_jobs)])
     cmd_list_run += [
         "-v",
         rclone_conf_str,

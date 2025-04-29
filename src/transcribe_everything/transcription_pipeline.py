@@ -31,7 +31,7 @@ _OTHER_ARGS = [
 def get_n_transcribers() -> int:
     """Get the number of transcribers."""
     try:
-        return int(os.environ.get("TRANSCRIBE_EVERYTHING_N_TRANSCRIBERS", 1))
+        return int(os.environ.get("GPU_JOBS", 1))
     except ValueError:
         logger.warning(
             "TRANSCRIBE_EVERYTHING_N_TRANSCRIBERS is not an integer, using default value of 1"
