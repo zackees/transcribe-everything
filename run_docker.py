@@ -12,6 +12,7 @@
 #     * Windows cmd.exe: `docker run --rm -it -v "%cd%\rclone.conf:/app/rclone.conf" niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
 #     * Macos/Linux: `docker run --rm -it -v "$(pwd)/rclone.conf:/app/rclone.conf" niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
 
+import subprocess
 import os
 import argparse
 from dataclasses import dataclass
@@ -76,8 +77,21 @@ def main() -> int:
     # return 0 if not err_count else 1
     cmd_pull = "docker pull niteris/transcribe-everything"
     rclone_conf_str = _to_volume_path(args.rclone_conf.name)
-    cmd_run = f"docker run --rm -it --gpus all -v {rclone_conf_str} niteris/transcribe-everything {args.src}"
 
+    cmd_list: list[str] = [
+        "docker",
+        "run",
+        "--rm",
+        "-it",
+        "--gpus",
+        "all",
+        "-v",
+        rclone_conf_str,
+        "niteris/transcribe-everything",
+        args.src,
+    ]
+
+    cmd_run = subprocess.list2cmdline(cmd_list)
     print(f"Running command: {cmd_pull}")
     os.system(cmd_pull)
     print(f"Running command: {cmd_run}")
