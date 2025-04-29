@@ -36,6 +36,13 @@ sudo apt-get update -y
 sudo apt-get install -y ubuntu-drivers-common
 sudo ubuntu-drivers autoinstall
 
+# now install uv and transcribe-everything
+
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
+uv venv
+uv pip install transcribe-everything
+
 echo Now reboot your system to complete the installation
 echo sudo reboot
 echo Afterwards, run the following command to verify the installation:

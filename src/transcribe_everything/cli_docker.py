@@ -67,15 +67,10 @@ class Args:
         ), f"Expected Path, got {type(self.rclone_conf)}"
 
 
-def _to_volume_path(rclone_name: str) -> str:
+def _to_volume_path(rclone_config_path: Path) -> str:
     """Convert a Path to a volume path for Docker."""
-    import platform
-
-    is_windows = platform.system() == "Windows"
-    if is_windows:
-        return f".\\{rclone_name}:/app/rclone.conf"
-    else:
-        return f"./{rclone_name}:/app/rclone.conf"
+    abs_path = rclone_config_path.resolve()
+    return f"{abs_path}:/app/rclone.conf"
 
 
 def main() -> int:
@@ -83,12 +78,12 @@ def main() -> int:
     args = Args.parse_args()
     print(f"Running with args: {args}")
     # switch to the directory of the rclone.conf file
-    os.chdir(args.rclone_conf.parent)
+    # os.chdir(args.rclone_conf.parent)
     # Here you would call your main function, e.g.:
     # err_count = run(args)
     # return 0 if not err_count else 1
     cmd_pull = "docker pull niteris/transcribe-everything"
-    rclone_conf_str = _to_volume_path(args.rclone_conf.name)
+    rclone_conf_str = _to_volume_path(args.rclone_conf)
 
     cmd_list_run: list[str] = [
         "docker",
