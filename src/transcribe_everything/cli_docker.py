@@ -1,6 +1,3 @@
-
-
-
 # # Docker
 #   * Install
 #     * docker pull niteris/transcribe-everything
@@ -12,11 +9,12 @@
 #     * Windows cmd.exe: `docker run --rm -it -v "%cd%\rclone.conf:/app/rclone.conf" niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
 #     * Macos/Linux: `docker run --rm -it -v "$(pwd)/rclone.conf:/app/rclone.conf" niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
 
-import subprocess
-import os
 import argparse
+import os
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+
 
 def _parse_args() -> "Args":
     parser = argparse.ArgumentParser(description="Transcribe everything.")
@@ -33,19 +31,27 @@ def _parse_args() -> "Args":
         default=Path("rclone.conf"),
         help="Path to rclone configuration file.",
     )
+    parser.add_argument(
+        "--gpu-batch-size",
+        type=int,
+        required=False,
+    )
 
     tmp = parser.parse_args()
     return Args(
         src=tmp.src,
         randomize=not tmp.no_randomize,
-        rclone_conf=tmp.rclone_conf
+        rclone_conf=tmp.rclone_conf,
+        gpu_batch_size=tmp.gpu_batch_size,
     )
+
 
 @dataclass
 class Args:
     src: str
     randomize: bool
     rclone_conf: Path
+    gpu_batch_size: int | None
 
     @staticmethod
     def parse_args() -> "Args":
@@ -53,18 +59,24 @@ class Args:
 
     def __post_init__(self):
         assert isinstance(self.src, str), f"Expected str, got {type(self.src)}"
-        assert isinstance(self.randomize, bool), f"Expected bool, got {type(self.randomize)}"
-        assert isinstance(self.rclone_conf, Path), f"Expected Path, got {type(self.rclone_conf)}"
+        assert isinstance(
+            self.randomize, bool
+        ), f"Expected bool, got {type(self.randomize)}"
+        assert isinstance(
+            self.rclone_conf, Path
+        ), f"Expected Path, got {type(self.rclone_conf)}"
 
 
 def _to_volume_path(rclone_name: str) -> str:
     """Convert a Path to a volume path for Docker."""
     import platform
+
     is_windows = platform.system() == "Windows"
     if is_windows:
-        return f".\{rclone_name}:/app/rclone.conf"
+        return f".\\{rclone_name}:/app/rclone.conf"
     else:
         return f"./{rclone_name}:/app/rclone.conf"
+
 
 def main() -> int:
     """Main entry point for the template_python_cmd package."""
@@ -91,14 +103,25 @@ def main() -> int:
         args.src,
     ]
 
+    env = os.environ.copy()
+
+    if args.gpu_batch_size is not None:
+        env["GPU_BATCH_SIZE"] = str(args.gpu_batch_size)
+
     cmd_run = subprocess.list2cmdline(cmd_list_run)
     print(f"Running command: {cmd_pull}")
-    os.system(cmd_pull)
+    rtn = subprocess.call(cmd_pull, shell=True)
+    if rtn != 0:
+        print(f"Failed to pull docker image: {rtn}")
+        return 1
     print(f"Running command: {cmd_run}")
-    os.system(cmd_run)
+    rtn = subprocess.call(cmd_list_run, shell=True, env=env)
+    return rtn
+
 
 if __name__ == "__main__":
     import sys
+
     src = "dst:TorrentBooks/podcast/dialogueworks01/youtube"
     sys.argv.append(src)
     # sys.argv.append("--batch-size")

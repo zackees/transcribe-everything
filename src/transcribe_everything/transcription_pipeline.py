@@ -20,7 +20,7 @@ logger = getLogger(__name__)
 
 _MODEL = os.environ.get("TRANSCRIBE_EVERYTHING_MODEL", "large-v3")
 _DEVICE = os.environ.get("TRANSCRIBE_EVERYTHING_DEVICE", "insane")
-_BATCH_SIZE = os.environ.get("TRANSCRIBE_EVERYTHING_BATCH_SIZE", 8)
+_BATCH_SIZE = os.environ.get("GPU_BATCH_SIZE", 8)
 
 _OTHER_ARGS = [
     "--batch-size",

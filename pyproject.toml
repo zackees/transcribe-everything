@@ -48,3 +48,4 @@ profile = "black"
 [project.scripts]
 transcribe-everything = "transcribe_everything.cli:main"
 transcribe-everything-init = "transcribe_everything.cli_init:main"
+transcribe-everything-run-docker = "transcribe_everything.cli_docker:main"

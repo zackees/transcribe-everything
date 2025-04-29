@@ -5,16 +5,18 @@ Unit test file.
 import os
 import unittest
 
-COMMAND = "transcribe_everything"
-
 
 class MainTester(unittest.TestCase):
     """Main tester class."""
 
-    @unittest.skip("Skip until implemented.")
-    def test_imports(self) -> None:
+    def test_main(self) -> None:
         """Test command line interface (CLI)."""
-        rtn = os.system(COMMAND)
+        rtn = os.system("transcribe-everything --help")
+        self.assertEqual(0, rtn)
+
+    def test_docker_main(self) -> None:
+        """Test docker command line interface (CLI)."""
+        rtn = os.system("transcribe-everything-run-docker --help")
         self.assertEqual(0, rtn)
 
 
