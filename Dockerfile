@@ -15,7 +15,6 @@ RUN pip install -e .
 
 
 # copy your rclone config
-COPY rclone.conf .
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x entrypoint.sh && dos2unix entrypoint.sh
 
@@ -23,4 +22,4 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 
 # This path is a rclone style remote path. You must have rclone.conf file
 # side by side with this program.
-CMD ["dst:TorrentBooks/podcast", "--batch-size", "20"]
+CMD ["--help"]
