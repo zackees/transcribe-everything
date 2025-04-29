@@ -20,18 +20,7 @@ from pathlib import Path
 def _parse_args() -> "Args":
     parser = argparse.ArgumentParser(description="Transcribe everything.")
     parser.add_argument("src", type=str, help="Source path.")
-    parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=10,
-        help="Maximum number of files to process in a batch.",
-    )
-    parser.add_argument(
-        "--max-batches",
-        type=int,
-        default=10,
-        help="Maximum number of batches to process.",
-    )
+
     parser.add_argument(
         "--no-randomize",
         action="store_true",
@@ -47,8 +36,6 @@ def _parse_args() -> "Args":
     tmp = parser.parse_args()
     return Args(
         src=tmp.src,
-        batch_size=tmp.batch_size,
-        max_batches=tmp.max_batches,
         randomize=not tmp.no_randomize,
         rclone_conf=tmp.rclone_conf
     )
@@ -56,8 +43,6 @@ def _parse_args() -> "Args":
 @dataclass
 class Args:
     src: str
-    batch_size: int
-    max_batches: int
     randomize: bool
     rclone_conf: Path
 
@@ -67,27 +52,18 @@ class Args:
 
     def __post_init__(self):
         assert isinstance(self.src, str), f"Expected str, got {type(self.src)}"
-        assert isinstance(self.batch_size, int), f"Expected int, got {type(self.batch_size)}"
-        assert isinstance(self.max_batches, int), f"Expected int, got {type(self.max_batches)}"
         assert isinstance(self.randomize, bool), f"Expected bool, got {type(self.randomize)}"
         assert isinstance(self.rclone_conf, Path), f"Expected Path, got {type(self.rclone_conf)}"
 
-# def _rclone_volume_path() -> str:
-#     import platform
-#     is_windows = platform.system() == "Windows"
-#     if is_windows:
-#         return r"%cd%\rclone.conf"
-#     else:
-#         return "$(pwd)/rclone.conf"
 
 def _to_volume_path(rclone_name: str) -> str:
     """Convert a Path to a volume path for Docker."""
     import platform
     is_windows = platform.system() == "Windows"
     if is_windows:
-        return f"%cd%\{rclone_name}:/app/rclone.conf"
+        return f".\{rclone_name}:/app/rclone.conf"
     else:
-        return f"{rclone_name}:/app/rclone.conf"
+        return f"./{rclone_name}:/app/rclone.conf"
 
 def main() -> int:
     """Main entry point for the template_python_cmd package."""
