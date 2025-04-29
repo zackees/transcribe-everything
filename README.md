@@ -2,17 +2,13 @@
 
 Transcribes everything!
 
-[![Linting](../../actions/workflows/lint.yml/badge.svg)](../../actions/workflows/lint.yml)
+# Docker
+  * Install
+    * docker pull niteris/transcribe-everything
 
-[![MacOS_Tests](../../actions/workflows/push_macos.yml/badge.svg)](../../actions/workflows/push_macos.yml)
-[![Ubuntu_Tests](../../actions/workflows/push_ubuntu.yml/badge.svg)](../../actions/workflows/push_ubuntu.yml)
-[![Win_Tests](../../actions/workflows/push_win.yml/badge.svg)](../../actions/workflows/push_win.yml)
+  * Help
+    * docker run --rm -it niteris/transcribe-everything --help
 
-
-# Notes
-
-  * GPU benchmark to prove GPU mode works
-    * `docker run --rm -it --gpus=all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
-
-
-    * # dst:TorrentBooks/podcast/dialogueworks01/youtube/Andrei_Martyanov_on_Scott_Ritter_and_Russia_Braces_as_NATOs_Desperation_Grows.txt
+  * Running
+    * Windows cmd.exe: `docker run --rm -it -v "%cd%\rclone.conf:/app/rclone.conf" niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
+    * Macos/Linux: `docker run --rm -it -v "$(pwd)/rclone.conf:/app/rclone.conf" niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
