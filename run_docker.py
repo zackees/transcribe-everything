@@ -78,7 +78,7 @@ def main() -> int:
     cmd_pull = "docker pull niteris/transcribe-everything"
     rclone_conf_str = _to_volume_path(args.rclone_conf.name)
 
-    cmd_list: list[str] = [
+    cmd_list_run: list[str] = [
         "docker",
         "run",
         "--rm",
@@ -91,7 +91,7 @@ def main() -> int:
         args.src,
     ]
 
-    cmd_run = subprocess.list2cmdline(cmd_list)
+    cmd_run = subprocess.list2cmdline(cmd_list_run)
     print(f"Running command: {cmd_pull}")
     os.system(cmd_pull)
     print(f"Running command: {cmd_run}")
