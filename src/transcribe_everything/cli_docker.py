@@ -45,7 +45,7 @@ def _parse_args() -> "Args":
 
     tmp = parser.parse_args()
     assert (
-        tmp.rclone_conf.exists()
+        tmp.config.exists()
     ), f"Please specify --config and point to a rclone.conf file. File does not exist: {tmp.rclone_conf}"
     return Args(
         src=tmp.src,
