@@ -6,21 +6,21 @@ Transcribes everything! Point this solution to a remote directory and this tool 
 
 # Docker
   * Install
-    * docker pull niteris/transcribe-everything
+    * 
 
   * Help
     * docker run --rm -it niteris/transcribe-everything --help
 
---gpu-batch-size
+  * Make sure docker is installed for your system.
 
-  * Running (easy)
-    * Install `transcribe-everything` locally and use the `transcribe-everything-run-docker` tool.
+  * Install using the `transcribe-everything-run-docker` tool (easy)
     * `uv venv`
     * `uv pip install transcribe-everything`
     * `uv run transcribe-everything-run-docker --gpu-batch-size 8 --gpu-jobs 1`
       * Play `--gpu-batch-size` and `--gpu-jobs` for performance tuning.
       * Defaults are tested to run stable for Nvidia 3070 12gb card.
 
-  * Running (Manually)
-    * Windows cmd.exe: `docker run --rm -it -v "%cd%\rclone.conf:/app/rclone.conf" --gpus all niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
-    * Macos/Linux: `docker run --rm -it -v "$(pwd)/rclone.conf:/app/rclone.conf" --gpus all niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
+  * Install + Running (Manually)
+    * Pull the image: `docker pull niteris/transcribe-everything`
+    * Windows cmd.exe: `docker run --rm -it -v ".\rclone.conf:/app/rclone.conf" --gpus all niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
+    * Macos/Linux: `docker run --rm -it -v "$./rclone.conf:/app/rclone.conf" --gpus all niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
