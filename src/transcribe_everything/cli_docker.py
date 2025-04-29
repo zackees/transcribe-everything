@@ -10,7 +10,6 @@
 #     * Macos/Linux: `docker run --rm -it -v "$(pwd)/rclone.conf:/app/rclone.conf" niteris/transcribe-everything dst:TorrentBooks/podcast/dialogueworks01/youtube`
 
 import argparse
-import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -98,10 +97,8 @@ def main() -> int:
         args.src,
     ]
 
-    env = os.environ.copy()
-
     if args.gpu_batch_size is not None:
-        env["GPU_BATCH_SIZE"] = str(args.gpu_batch_size)
+        cmd_list_run.extend(["-e", "GPU_BATCH_SIZE=" + str(args.gpu_batch_size)])
 
     cmd_run = subprocess.list2cmdline(cmd_list_run)
     print(f"Running command: {cmd_pull}")
@@ -110,7 +107,7 @@ def main() -> int:
         print(f"Failed to pull docker image: {rtn}")
         return 1
     print(f"Running command: {cmd_run}")
-    rtn = subprocess.call(cmd_run, shell=True, env=env)
+    rtn = subprocess.call(cmd_run, shell=True)
     return rtn
 
 
