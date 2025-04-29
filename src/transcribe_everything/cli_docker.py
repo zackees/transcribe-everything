@@ -44,13 +44,14 @@ def _parse_args() -> "Args":
     )
 
     tmp = parser.parse_args()
+    config: Path = Path(tmp.config)
     assert (
-        tmp.config.exists()
+        config.exists()
     ), f"Please specify --config and point to a rclone.conf file. File does not exist: {tmp.rclone_conf}"
     return Args(
         src=tmp.src,
         randomize=not tmp.no_randomize,
-        rclone_conf=tmp.rclone_conf,
+        rclone_conf=config,
         gpu_batch_size=tmp.gpu_batch_size,
         gpu_jobs=tmp.gpu_jobs,
     )
